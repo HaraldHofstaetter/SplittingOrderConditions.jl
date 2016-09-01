@@ -62,10 +62,10 @@ multinomial_coeff(q::Int, k::Array{Int,1}) = div(factorial(q), prod([factorial(i
 
 
 function generate_equations(q::Int, s::Int)
-    eq = Dict{Array{Int,1}, AbstractString}()
-    for i in Lyndon(2, q)
-        if length(i)==q
-            eq[i] = ""
+    eqs = Dict{Array{Int,1}, AbstractString}()
+    for j in Lyndon(2, q)
+        if length(j)==q
+            eqs[j] = ""
         end
     end
 
@@ -80,7 +80,7 @@ function generate_equations(q::Int, s::Int)
                 append!(W, ones(Int, l[j]))
                 append!(W, zeros(Int, k[j]-l[j]))
             end
-            if W in keys(eq)
+            if W in keys(eqs)
                 coeff =  multinomial_coeff(q, k)            
                 for j=1:s      
                     coeff = coeff * binomial(k[j], l[j])
@@ -100,14 +100,14 @@ function generate_equations(q::Int, s::Int)
                         h = string(h,"^",l[j])
                     end
                 end
-                eq[W] = string(eq[W],"+",h)
+                eqs[W] = string(eqs[W],"+",h)
             end
         end
     end
-    for (W, h) in eq
-        eq[W] = string(h,"-1")
+    for (W, h) in eqs
+        eqs[W] = string(h,"-1")
     end
-    eq
+    eqs
 end
 
 end
