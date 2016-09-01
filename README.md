@@ -1,6 +1,6 @@
-# SplittingOrderConditions
+#SplittingOrderConditions.jl
 
-Setup order conditions for splitting methods.
+A Julia package for generating order conditions for splitting methods.
 
 For more informations, see:
 
