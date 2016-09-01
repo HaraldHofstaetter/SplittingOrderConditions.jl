@@ -48,6 +48,9 @@ function Base.next(MF::MultiFor, k::Array{Int,1})
     for i=1:length(k)
         if k[i]<MF.k[i]
             k[i] += 1
+            for j = 1:i-1                 
+                k[j] = 0       
+            end
             return (copy(k), k)
         end
     end            
@@ -102,7 +105,7 @@ function generate_equations(q::Int, s::Int)
         end
     end
     for (K, h) in L
-        L[K] = string(h,"-1=0")
+        L[K] = string(h,"-1")
     end
     L
 end
