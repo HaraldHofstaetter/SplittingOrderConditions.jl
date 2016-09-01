@@ -2,7 +2,7 @@
 
 A Julia package for generating order conditions for splitting methods.
 
-For more information, see:
+For more information, see the examples below and the paper:
 
 >[W. Auzinger](http://www.asc.tuwien.ac.at/~winfried), [W. Herfort](http://www.asc.tuwien.ac.at/~herfort/), [H. Hofstätter](http://www.harald-hofstaetter.at), [O. Koch](http://othmar-koch.org), [Setup of Order Conditions for Splitting Methods](http://arxiv.org/pdf/1605.00445.pdf), to appear in [Proceedings of CASC 2016](http://www.casc.cs.uni-bonn.de/2016/).
 
