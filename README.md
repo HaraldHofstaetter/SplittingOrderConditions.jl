@@ -7,7 +7,7 @@ For more information, see the examples below and the paper:
 >[W. Auzinger](http://www.asc.tuwien.ac.at/~winfried), [W. Herfort](http://www.asc.tuwien.ac.at/~herfort/), [H. Hofstätter](http://www.harald-hofstaetter.at), [O. Koch](http://othmar-koch.org), [Setup of Order Conditions for Splitting Methods](http://arxiv.org/pdf/1605.00445.pdf), to appear in [Proceedings of CASC 2016](http://www.casc.cs.uni-bonn.de/2016/).
 
 ##Algorithm
-The function `generate_equations(q,s)` of this package implements the following algorithm:
+The function [`generate_equations(q,s)`](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/src/SplittingOrderConditions.jl#L64) of this package implements the following algorithm:
 >![](https://raw.githubusercontent.com/HaraldHofstaetter/SplittingOrderConditions.jl/master/generate_equations1.png)
 
 ##Installation
