@@ -61,13 +61,44 @@ multinomial_coeff(q::Int, k::Array{Int,1}) = div(factorial(q), prod([factorial(i
 
 
 
-function generate_equations(q::Int, s::Int)
+function generate_equations(q::Int, s::Int; symmetric::Bool=false, palindromic::Bool=false,
+                            last_b_is_zero::Bool=false)
     eqs = Dict{Array{Int,1}, AbstractString}()
-    for j in Lyndon(2, q)
-        if length(j)==q
-            eqs[j] = ""
-        end
+    if symmetric && iseven(q)
+        return eqs
     end
+    if symmetric
+        palindromic = false
+        last_b_is_zero = true    
+        s2 = ceil(Int,s/2)
+        s3 = isodd(s)?s2-1:s2
+        a = vcat([string("a[", j, "]") for j=1:s2], [string("a[", j, "]") for j=s3:-1:1])
+        s2 = ceil(Int,(s-1)/2)
+        s3 = iseven(s)?s2-1:s2
+        b = vcat([string("b[", j, "]") for j=1:s2], [string("b[", j, "]") for j=s3:-1:1],["0"])
+    elseif palindromic
+        last_b_is_zero = false 
+        s2 = ceil(Int,s/2)
+        s3 = isodd(s)?s2-1:s2
+        a = vcat([string("a[", j, "]") for j=1:s2], [string("b[", j, "]") for j=s3:-1:1])
+        b = reverse(a)
+    else
+        a = [string("a[", j, "]") for j=1:s]
+        b = [string("b[", j, "]") for j=1:s]
+    end
+    if palindromic
+        for j in Lyndon(2, q)
+            if length(j)==q && !haskey(eqs, [x==0?1:0 for x in reverse(j)])
+                eqs[j] = ""
+            end
+        end
+    else
+        for j in Lyndon(2, q)
+            if length(j)==q
+                eqs[j] = ""
+            end
+        end
+    end    
 
     for k0 in Combinatorics.WithReplacementCombinations(1:s,q)
         k = zeros(Int,s)
@@ -80,21 +111,21 @@ function generate_equations(q::Int, s::Int)
                 append!(W, ones(Int, l[j]))
                 append!(W, zeros(Int, k[j]-l[j]))
             end
-            if W in keys(eqs)
+            if W in keys(eqs) && !(last_b_is_zero && l[s]>0)
                 coeff =  multinomial_coeff(q, k)            
                 for j=1:s      
                     coeff = coeff * binomial(k[j], l[j])
                 end
                 h = string(coeff)
-                for j=1:s            
+                for j=1:s        
                     if k[j]-l[j]>0
-                        h = string(h,"*a[",j,"]")
+                        h = string(h,"*",a[j])
                     end                    
                     if k[j]-l[j]>1
                         h = string(h,"^",k[j]-l[j])
                     end
                     if l[j]>0
-                        h = string(h,"*b[",j,"]")
+                        h = string(h,"*",b[j])
                     end    
                     if l[j]>1
                         h = string(h,"^",l[j])
