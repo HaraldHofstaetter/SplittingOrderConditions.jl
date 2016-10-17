@@ -29,4 +29,4 @@ cp(joinpath(homedir(), ".julia/v0.4/SplittingOrderConditions/examples/"), joinpa
 ```
 Then 'SplittingOrderConditions_examples' will be listed in the JuliaBox home screen. The examples contain among others
 + [TestSplittingOrderConditions.ipynb](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/examples/TestSplittingOrderConditions.ipynb)
-+ [TestFORM.ipyn](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/examples/TestForm.ipynb)
++ [TestFORM.ipynb](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/examples/TestFORM.ipynb)
