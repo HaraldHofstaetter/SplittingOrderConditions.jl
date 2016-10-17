@@ -2,7 +2,7 @@ module SplittingOrderConditions
 
 import Base: start, next, done
 
-export Lyndon, MultiFor, multinomial_coeff, generate_equations
+export Lyndon, MultiFor, multinomial_coeff, generate_equations, call_form
    
 using Combinatorics
 
@@ -62,7 +62,7 @@ multinomial_coeff(q::Int, k::Array{Int,1}) = div(factorial(q), prod([factorial(i
 
 
 function generate_equations(q::Int, s::Int; symmetric::Bool=false, palindromic::Bool=false,
-                            last_b_is_zero::Bool=false)
+                            last_b_is_zero::Bool=false, with_brackets::Bool=true)
     eqs = Dict{Array{Int,1}, AbstractString}()
     if symmetric && iseven(q)
         return eqs
@@ -72,19 +72,36 @@ function generate_equations(q::Int, s::Int; symmetric::Bool=false, palindromic::
         last_b_is_zero = true    
         s2 = ceil(Int,s/2)
         s3 = isodd(s)?s2-1:s2
-        a = vcat([string("a[", j, "]") for j=1:s2], [string("a[", j, "]") for j=s3:-1:1])
+        if with_brackets
+            a = vcat([string("a[", j, "]") for j=1:s2], [string("a[", j, "]") for j=s3:-1:1])
+        else    
+            a = vcat([string("a", j) for j=1:s2], [string("a", j) for j=s3:-1:1])
+        end
         s2 = ceil(Int,(s-1)/2)
         s3 = iseven(s)?s2-1:s2
-        b = vcat([string("b[", j, "]") for j=1:s2], [string("b[", j, "]") for j=s3:-1:1],["0"])
+        if with_brackets
+            b = vcat([string("b[", j, "]") for j=1:s2], [string("b[", j, "]") for j=s3:-1:1],["0"])
+        else
+            b = vcat([string("b", j) for j=1:s2], [string("b", j) for j=s3:-1:1],["0"])
+        end
     elseif palindromic
         last_b_is_zero = false 
         s2 = ceil(Int,s/2)
         s3 = isodd(s)?s2-1:s2
-        a = vcat([string("a[", j, "]") for j=1:s2], [string("b[", j, "]") for j=s3:-1:1])
+        if with_brackets
+            a = vcat([string("a[", j, "]") for j=1:s2], [string("b[", j, "]") for j=s3:-1:1])
+        else            
+            a = vcat([string("a", j) for j=1:s2], [string("b", j) for j=s3:-1:1])
+        end    
         b = reverse(a)
     else
-        a = [string("a[", j, "]") for j=1:s]
-        b = [string("b[", j, "]") for j=1:s]
+        if with_brackets
+            a = [string("a[", j, "]") for j=1:s]
+            b = [string("b[", j, "]") for j=1:s]
+        else    
+            a = [string("a", j) for j=1:s]
+            b = [string("b", j) for j=1:s]
+        end
     end
     if palindromic
         for j in Lyndon(2, q)
@@ -140,5 +157,31 @@ function generate_equations(q::Int, s::Int; symmetric::Bool=false, palindromic::
     end
     eqs
 end
+
+
+function call_form(input::ASCIIString; threads=1)
+    attempts = 0
+    FORM_PID=0
+    path = joinpath(dirname(@__FILE__), "../deps/bin")
+    out = "Error initializing preset external channels\n"
+    while out == "Error initializing preset external channels\n" 
+        (so,si,pr) = readandwrite(`$path/tform -w$(threads) -t /tmp -M  -q -pipe 0,1 $path/pipe.frm`)
+        FORM_PID = readuntil(so,'\n')[1:end-1];
+        print(si, FORM_PID,',',getpid(),"\n\n", input,"\n\n")
+        close(si)
+        out = readall(so)
+        close(si)
+        close(so)
+        close(pr)
+        attempts +=1
+    end
+    println(STDERR, "# of attemps to call form = ",attempts)
+    try 
+        rm("/tmp/xform$FORM_PID.str") # delete generated temporary file
+    end    
+    out
+end
+
+
 
 end
