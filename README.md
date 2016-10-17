@@ -20,6 +20,7 @@ The function [`generate_equations(q,s)`](https://github.com/HaraldHofstaetter/Sp
 In a Julia notebook type
 ```julia
 Pkg.clone("https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl")
+Pkg.build("SplittingOrderConditions")
 ```
 ##Examples
 To get easy access to the examples, copy them into the home directory:
@@ -28,3 +29,4 @@ cp(joinpath(homedir(), ".julia/v0.4/SplittingOrderConditions/examples/"), joinpa
 ```
 Then 'SplittingOrderConditions_examples' will be listed in the JuliaBox home screen. The examples contain among others
 + [TestSplittingOrderConditions.ipynb](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/examples/TestSplittingOrderConditions.ipynb)
++ [TestFORM.ipyn](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/examples/TestForm.ipynb)
