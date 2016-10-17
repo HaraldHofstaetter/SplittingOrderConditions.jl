@@ -11,7 +11,7 @@ For more information, see the examples below and the papers:
 
 >[W. Auzinger](http://www.asc.tuwien.ac.at/~winfried), [H. Hofstätter](http://www.harald-hofstaetter.at), [D. Ketcheson](http://www.kaust.edu.sa/faculty/ketcheson.html), [O. Koch](http://othmar-koch.org), [Practical Splitting Methods for the Adaptive Integration of Nonlinear Evolution Equations. Part I: Construction of Optimized Schemes and Pairs of Schemes](http://link.springer.com/content/pdf/10.1007%2Fs10543-016-0626-9.pdf), [ BIT Numer. Math. (2016), doi:10.1007/s10543-016-0626-9](http://link.springer.com/article/10.1007/s10543-016-0626-9).
 
-The newest version contains a Julia interface to [FORM](http://www.nikhef.nl/~form/), a Symbolic Manipulation System which will be used to generate optimized Julia functions from the multivariate polynomial equations representing order conditions for splitting methods. These optimzed Julia functions will then serve as input for some Julia Nonlinear Optimization package.
+The newest version contains a Julia interface to [FORM](http://www.nikhef.nl/~form/), a Symbolic Manipulation System which will are to generate optimized Julia functions from the multivariate polynomial equations representing order conditions for splitting methods. These optimzed Julia functions then serve as input for some Julia Nonlinear Optimization package.
 
 ##Algorithm
 The function [`generate_equations(q,s)`](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/src/SplittingOrderConditions.jl#L64) of this package implements the following algorithm:
