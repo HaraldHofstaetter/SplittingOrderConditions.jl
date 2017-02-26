@@ -184,4 +184,65 @@ end
 
 
 
+function compile_fg(fun::AbstractString, n::Integer; threads=1)
+    fun = replace(replace(fun,"[", "("), "]", ")")
+    input = string("""
+Off Statistics;
+V x;
+S u;
+""","Local f0 = ",
+    fun,
+    ";\n",
+"""
+#write <> "begin"
+#write <> "  if length(g)==0"
+Print;
+Format O3;
+Format maple;
+.sort;
+#write <> "    return f0"
+#write <> "  else"
+I i;
+S m, xx, u;
+Hide f0;
+#do i=1,$(n)
+    Local f'i' = f0;
+    id x('i') = xx;
+    id xx^m? = m*xx^(m-1);
+    id xx = x('i');
+    .sort
+    Hide f'i';
+#enddo
+.sort;
+""","Local H = ",
+    join(["u^$(j+1)*f$(j)" for j=0:n],:+),
+    ";\n",
+"""
+B u;
+.sort
+#optimize H
+B u;
+.sort
+""",
+    join(["Local F$(j) = H[u^$(j+1)];\n" for j=0:n], ""),
+"""
+.sort
+#write <> "%4O",
+""", "#write <> \"\n   f=%e   ",
+join(["g($(j))=%e" for j=1:n],"    "),
+"\", ",
+join(["F$(j)" for j=0:n],","),
+"""
+#write <> "    return f"
+#write <> "  end"
+#write <> "end"
+.end
+""")
+    out = call_form(input, threads=threads)
+    out = replace(replace(out,"(", "["), ")", "]")    
+    eval(parse(string("(x,g)->",out)))
+end    
+
+
+
 end
