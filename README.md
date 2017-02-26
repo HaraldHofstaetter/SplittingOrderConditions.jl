@@ -11,6 +11,7 @@ For more information, see the examples below and the papers:
 
 >[W. Auzinger](http://www.asc.tuwien.ac.at/~winfried), [H. Hofstätter](http://www.harald-hofstaetter.at), [D. Ketcheson](http://www.kaust.edu.sa/faculty/ketcheson.html), [O. Koch](http://othmar-koch.org), [Practical Splitting Methods for the Adaptive Integration of Nonlinear Evolution Equations. Part I: Construction of Optimized Schemes and Pairs of Schemes](http://link.springer.com/content/pdf/10.1007%2Fs10543-016-0626-9.pdf), [ BIT Numer. Math. (2016), doi:10.1007/s10543-016-0626-9](http://link.springer.com/article/10.1007/s10543-016-0626-9).
 
+The newest version contains a Julia interface to [FORM](http://www.nikhef.nl/~form/), a Symbolic Manipulation System which is used to generate optimized Julia functions from the multivariate polynomial equations representing order conditions for splitting methods. These optimized Julia functions then serve as input for some Julia Nonlinear Optimization package.
 
 ##Algorithm
 The function [`generate_equations(q,s)`](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/src/SplittingOrderConditions.jl#L64) of this package implements the following algorithm:
@@ -29,4 +30,4 @@ cp(joinpath(homedir(), ".julia/v0.4/SplittingOrderConditions/examples/"), joinpa
 ```
 Then 'SplittingOrderConditions_examples' will be listed in the JuliaBox home screen. The examples contain among others
 + [TestSplittingOrderConditions.ipynb](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/examples/TestSplittingOrderConditions.ipynb)
-+ [TestFORM.ipyn](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/examples/TestForm.ipynb)
++ [TestFORM.ipynb](https://github.com/HaraldHofstaetter/SplittingOrderConditions.jl/blob/master/examples/TestFORM.ipynb)
