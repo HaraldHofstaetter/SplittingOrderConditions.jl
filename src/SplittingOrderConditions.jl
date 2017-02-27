@@ -231,7 +231,7 @@ B u;
 """, "#write <> \"\n   f=%e   ",
 join(["g($(j))=%e" for j=1:n],"    "),
 "\", ",
-join(["F$(j)" for j=0:n],","),
+join(["F$(j)" for j=0:n],","),"\n",
 """
 #write <> "    return f"
 #write <> "  end"
@@ -240,6 +240,7 @@ join(["F$(j)" for j=0:n],","),
 """)
     out = call_form(input, threads=threads)
     out = replace(replace(out,"(", "["), ")", "]")    
+    out = replace(out,"length[g]", "length(g)")
     eval(parse(string("(x,g)->",out)))
 end    
 
