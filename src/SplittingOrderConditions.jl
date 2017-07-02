@@ -3,6 +3,7 @@ module SplittingOrderConditions
 import Base: start, next, done
 
 export Lyndon, MultiFor, multinomial_coeff, generate_equations, call_form
+export generate_equations_ABC
    
 using Combinatorics
 
@@ -157,6 +158,127 @@ function generate_equations(q::Int, s::Int; symmetric::Bool=false, palindromic::
     end
     eqs
 end
+
+
+function generate_equations_ABC(q::Int, s::Int; symmetric::Bool=false, palindromic::Bool=false,
+                            last_c_is_zero::Bool=false, last_b_is_zero::Bool=false, with_brackets::Bool=true)
+    eqs = Dict{Array{Int,1}, AbstractString}()
+    if symmetric && iseven(q)
+        return eqs
+    end
+    if last_b_is_zero
+       last_c_is_zero = true
+    end   
+    if symmetric
+        error("symmertric not implemented.")
+        #palindromic = false
+        #last_c_is_zero = true    
+        #last_b_is_zero = true    
+        #s2 = ceil(Int,s/2)
+        #s3 = isodd(s)?s2-1:s2
+        #if with_brackets
+        #    a = vcat([string("a[", j, "]") for j=1:s2], [string("a[", j, "]") for j=s3:-1:1])
+        #else    
+        #    a = vcat([string("a", j) for j=1:s2], [string("a", j) for j=s3:-1:1])
+        #end
+        #s2 = ceil(Int,(s-1)/2)
+        #s3 = iseven(s)?s2-1:s2
+        #if with_brackets
+        #    b = vcat([string("b[", j, "]") for j=1:s2], [string("b[", j, "]") for j=s3:-1:1],["0"])
+        #else
+        #    b = vcat([string("b", j) for j=1:s2], [string("b", j) for j=s3:-1:1],["0"])
+        #end
+    elseif palindromic
+        last_c_is_zero = false 
+        last_b_is_zero = false 
+        s2 = ceil(Int,s/2)
+        s3 = isodd(s)?s2-1:s2
+        if with_brackets
+            a = vcat([string("a[", j, "]") for j=1:s2], [string("c[", j, "]") for j=s3:-1:1])
+            b = vcat([string("b[", j, "]") for j=1:s2], [string("b[", j, "]") for j=s3:-1:1])
+        else            
+            a = vcat([string("a", j) for j=1:s2], [string("c", j) for j=s3:-1:1])
+            b = vcat([string("b", j) for j=1:s2], [string("b", j) for j=s3:-1:1])
+        end    
+        c = reverse(a)
+    else
+        if with_brackets
+            a = [string("a[", j, "]") for j=1:s]
+            b = [string("b[", j, "]") for j=1:s]
+            c = [string("c[", j, "]") for j=1:s]
+        else    
+            a = [string("a", j) for j=1:s]
+            b = [string("b", j) for j=1:s]
+            c = [string("c", j) for j=1:s]
+        end
+    end
+    if palindromic
+        rr = (2, 1, 0)
+        for j in Lyndon(3, q)
+            if length(j)==q && !haskey(eqs, [rr[x+1] for x in reverse(j)])
+                eqs[j] = ""
+            end
+        end
+    else
+        for j in Lyndon(3, q)
+            if length(j)==q
+                eqs[j] = ""
+            end
+        end
+    end    
+
+    for k0 in Combinatorics.WithReplacementCombinations(1:s,q)
+        k = zeros(Int,s)
+        for j in k0
+            k[j]+=1
+        end
+        for lA = MultiFor(k)
+        for lB = MultiFor(k-lA)
+        for lC = MultiFor(k-lA-lB)
+            W=Int[]
+            for j=s:-1:1
+                append!(W, 2*ones(Int, lC[j]))
+                append!(W, ones(Int, lB[j]))
+                append!(W, zeros(Int, lA[j]))
+            end
+            if W in keys(eqs) && !(last_b_is_zero && lB[s]>0)  && !(last_c_is_zero && lC[s]>0) 
+                coeff =  multinomial_coeff(q, k)            
+                for j=1:s      
+                    coeff = coeff * multinomial_coeff(k[j], [lA[j], lB[j], lC[j]])
+                end
+                h = string(coeff)
+                for j=1:s        
+                    if lA[j]>0
+                        h = string(h,"*",a[j])
+                    end                    
+                    if lA[j]>1
+                        h = string(h,"^",lA[j])
+                    end
+                    if lB[j]>0
+                        h = string(h,"*",b[j])
+                    end    
+                    if lB[j]>1
+                        h = string(h,"^",lB[j])
+                    end
+                    if lC[j]>0
+                        h = string(h,"*",c[j])
+                    end    
+                    if lC[j]>1
+                        h = string(h,"^",lC[j])
+                    end
+                end
+                eqs[W] = string(eqs[W],"+",h)
+            end
+        end
+        end
+        end
+    end
+    for (W, h) in eqs
+        eqs[W] = string(h,"-1")
+    end
+    eqs
+end
+
 
 
 function call_form(input::ASCIIString; threads=1)
