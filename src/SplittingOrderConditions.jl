@@ -3,7 +3,8 @@ module SplittingOrderConditions
 import Base: start, next, done
 
 export Lyndon, MultiFor, multinomial_coeff, generate_equations, call_form
-export generate_equations_ABC
+export generate_equations_ABC, get_ABC_coeffs
+export compute_residua, compute_residua_ABC, get_lem, get_p_lem
    
 using Combinatorics
 
@@ -277,6 +278,160 @@ function generate_equations_ABC(q::Int, s::Int; symmetric::Bool=false, palindrom
         eqs[W] = string(h,"-1")
     end
     eqs
+end
+
+
+function compute_residua(q::Int, a::Vector, b::Vector)
+    s = length(a)
+    T = typeof(a[1])
+    eqs = Dict{Array{Int,1}, T}()
+
+    aa = zeros(T, s, q+1)
+    bb = zeros(T, s, q+1)
+    aa[:,1] = ones(T, s)
+    bb[:,1] = ones(T, s)
+    for k=1:q
+        aa[:,k+1] = aa[:,k].*a
+        bb[:,k+1] = bb[:,k].*b
+    end
+
+    for j in Lyndon(2, q)
+        if length(j)==q
+            eqs[j] = -one(T) 
+        end
+    end
+
+    for k0 in Combinatorics.WithReplacementCombinations(1:s,q)
+        k = zeros(Int,s)
+        for j in k0
+            k[j]+=1
+        end
+        for l = MultiFor(k)
+            W=Int[]
+            for j=s:-1:1
+                append!(W, ones(Int, l[j]))
+                append!(W, zeros(Int, k[j]-l[j]))
+            end
+            if W in keys(eqs)
+                h =  multinomial_coeff(q, k)            
+                for j=1:s      
+                    h *= binomial(k[j], l[j])
+                end
+                for j=1:s        
+                    h *= aa[j, k[j]-l[j]+1] * bb[j, l[j]+1] 
+                end
+                eqs[W] += h
+            end
+        end
+    end
+    eqs
+end
+
+get_lem(q, a, b) = norm(collect(values(compute_residua(q, a, b))))
+
+function get_p_lem(a,b)
+    q = 1    
+    while true
+        lem = get_lem(q,a,b) 
+        if lem>1e-11
+            return q-1, lem
+        end
+        q += 1
+    end
+end
+
+
+function get_ABC_coeffs(a,b)
+    s=length(a)
+    T = typeof(a[1])
+    S = 2*s-1
+    A = zeros(T, S)
+    B = zeros(T, S)
+    C = zeros(T, S)
+    h = a[1]
+    for k=1:s
+        K = 2*k-1
+        A[K] = a[k]
+        B[K] = h
+        C[K] = b[k]
+        h = b[k]-h
+        if k<s
+            A[K+1] = 0.0
+            B[K+1] = h
+            C[K+1] = 0.0
+            h = a[k+1]-h
+        end
+    end
+    A, B, C
+end    
+
+
+
+function compute_residua_ABC(q::Int, a::Vector, b::Vector, c::Vector)
+    s = length(a)
+    T = typeof(a[1])
+    eqs = Dict{Array{Int,1}, T}()
+
+    aa = zeros(T, s, q+1)
+    bb = zeros(T, s, q+1)
+    cc = zeros(T, s, q+1)
+    aa[:,1] = ones(T, s)
+    bb[:,1] = ones(T, s)
+    cc[:,1] = ones(T, s)
+    for k=1:q
+        aa[:,k+1] = aa[:,k].*a
+        bb[:,k+1] = bb[:,k].*b
+        cc[:,k+1] = cc[:,k].*c
+    end
+
+    for j in Lyndon(3, q)
+        if length(j)==q
+            eqs[j] = -one(T) 
+        end
+    end
+
+    for k0 in Combinatorics.WithReplacementCombinations(1:s,q)
+        k = zeros(Int,s)
+        for j in k0
+            k[j]+=1
+        end
+        for lA = MultiFor(k)
+        for lB = MultiFor(k-lA)
+        for lC = MultiFor(k-lA-lB)
+            W=Int[]
+            for j=s:-1:1
+                append!(W, 2*ones(Int, lC[j]))
+                append!(W, ones(Int, lB[j]))
+                append!(W, zeros(Int, lA[j]))
+            end
+            if W in keys(eqs)
+                h =  multinomial_coeff(q, k)            
+                for j=1:s      
+                    h *= multinomial_coeff(k[j], [lA[j], lB[j], lC[j]])
+                end
+                for j=1:s        
+                    h *= aa[j, lA[j]+1] * bb[j, lB[j]+1] * cc[j, lC[j]+1]
+                end
+                eqs[W] += h
+            end
+        end
+        end
+        end
+    end
+    eqs
+end
+
+get_lem(q, a, b, c) = norm(collect(values(compute_residua_ABC(q, a, b, c))))
+
+function get_p_lem(a,b,c)
+    q = 1    
+    while true
+        lem = get_lem(q,a,b,c) 
+        if lem>1e-11
+            return q-1, lem
+        end
+        q += 1
+    end
 end
 
 
